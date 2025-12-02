@@ -472,6 +472,22 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+  // Function to generate share URLs for an activity
+  function generateShareUrls(activityName, description, schedule) {
+    const pageUrl = window.location.origin;
+    const shareText = `Check out ${activityName} at Mergington High School! ${description} Schedule: ${schedule}`;
+    const encodedText = encodeURIComponent(shareText);
+    const encodedUrl = encodeURIComponent(pageUrl);
+    const encodedSubject = encodeURIComponent(`Mergington High School Activity: ${activityName}`);
+
+    return {
+      twitter: `https://x.com/intent/tweet?text=${encodedText}&url=${encodedUrl}`,
+      facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}&quote=${encodedText}`,
+      linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+      email: `mailto:?subject=${encodedSubject}&body=${encodedText}%0A%0ALearn more at: ${encodedUrl}`
+    };
+  }
+
   // Function to render a single activity card
   function renderActivityCard(name, details) {
     const activityCard = document.createElement("div");
@@ -499,6 +515,9 @@ document.addEventListener("DOMContentLoaded", () => {
     // Format the schedule using the new helper function
     const formattedSchedule = formatSchedule(details);
 
+    // Generate share URLs
+    const shareUrls = generateShareUrls(name, details.description, formattedSchedule);
+
     // Create activity tag
     const tagHtml = `
       <span class="activity-tag" style="background-color: ${typeInfo.color}; color: ${typeInfo.textColor}">
@@ -516,6 +535,25 @@ document.addEventListener("DOMContentLoaded", () => {
           <span>${takenSpots} enrolled</span>
           <span>${spotsLeft} spots left</span>
         </div>
+      </div>
+    `;
+
+    // Create share buttons
+    const shareButtonsHtml = `
+      <div class="share-buttons">
+        <span class="share-label">Share:</span>
+        <a href="${shareUrls.twitter}" target="_blank" rel="noopener noreferrer" class="share-btn share-twitter" title="Share on X" aria-label="Share on X (formerly Twitter)">
+          𝕏
+        </a>
+        <a href="${shareUrls.facebook}" target="_blank" rel="noopener noreferrer" class="share-btn share-facebook" title="Share on Facebook" aria-label="Share on Facebook">
+          f
+        </a>
+        <a href="${shareUrls.linkedin}" target="_blank" rel="noopener noreferrer" class="share-btn share-linkedin" title="Share on LinkedIn" aria-label="Share on LinkedIn">
+          in
+        </a>
+        <a href="${shareUrls.email}" class="share-btn share-email" title="Share via Email" aria-label="Share via Email">
+          ✉
+        </a>
       </div>
     `;
 
@@ -552,6 +590,7 @@ document.addEventListener("DOMContentLoaded", () => {
             .join("")}
         </ul>
       </div>
+      ${shareButtonsHtml}
       <div class="activity-card-actions">
         ${
           currentUser
